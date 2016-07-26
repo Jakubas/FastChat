@@ -1,0 +1,38 @@
+<project name="FastChat" default="main" basedir=".">
+
+	<property name="clientName" value="FastChatClient" />
+	<property name="serverName" value="FastChatServer" />
+	
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="bin" />
+	<property name="dist.dir" location="dist" />
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" />
+	</target>
+
+	<target name="distClient" depends="compile" description="client package, output to JAR">
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/${clientName}-${DSTAMP}.jar" basedir="${build.dir}/client" >
+		</jar>
+	</target>
+	
+	<target name="distServer" depends="compile" description="server package, output to JAR">
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/${serverName}-${DSTAMP}.jar" basedir="${build.dir}/server" >
+		</jar>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+	
+	<target name="main" depends="clean, compile, distClient, distServer" />
+	
+</project>
