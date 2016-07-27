@@ -13,6 +13,8 @@ public class Client extends Thread {
 	private Socket clientSocket;
 	private PrintWriter out;
 	private BufferedReader in;
+	private ClientConnection clientConnection;
+	private ChatProtocol chatProtocol;
 	
 	public Client(Socket clientSocket) {
 		id = generateId();
@@ -26,7 +28,13 @@ public class Client extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		processInput();
+		
+	}
+	
+	public void run() {
+		//add check to see if client is still alive
+		chatProtocol = new ChatProtocol(this);
+		chatProtocol.processInput();
 	}
 	
 	public int generateId() {
@@ -52,6 +60,18 @@ public class Client extends Thread {
 		return in;
 	}
 	
+	public ClientConnection getClientConnection() {
+		return clientConnection;
+	}
+	
+	public ChatProtocol getChatProtocol() {
+		return chatProtocol;
+	}
+	
+	public void setClientConnection(ClientConnection clientConnection) {
+		this.clientConnection = clientConnection;
+	}
+	
 	public void writeToClient(String s) {
 		out.write(s);
 	}
@@ -63,27 +83,5 @@ public class Client extends Thread {
 			System.err.println("Couldn't read line");
 		}
 		return null;
-	}
-	
-	private void processInput() {
-		String inputLine;
-		writeToClient("What would you like to do? Type /help for information about available commands");
-		if ((inputLine = readFromClient()) != null) {
-			if (inputLine.equals("/connect")) {
-				connectClients();
-			} else if (inputLine.equals("/help")) {
-				provideInfo();
-			}
-		}
-	}
-	
-	private void connectClients() {
-		ClientConnector clientConnector = new ClientConnector(this);
-	}
-	
-	private void provideInfo() {
-		writeToClient("The available commands are:");
-		writeToClient("/connect - starts the process for connecting with another user");
-		writeToClient("/help - displays help about available commands");
 	}
 }

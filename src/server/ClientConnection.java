@@ -1,13 +1,18 @@
 package server;
 
-public class ClientConnector {
+public class ClientConnection {
 
 	private Client hostClient;
 	private Client targetClient;
 	
-	public ClientConnector(Client hostClient) {
+	public ClientConnection(Client hostClient) {
 		this.hostClient = hostClient;
 		this.targetClient = connectClients();
+	}
+	
+	public ClientConnection(Client hostClient, Client targetClient) {
+		this.hostClient = hostClient;
+		this.targetClient = targetClient;
 	}
 	
 	public Client getHostClient() {
@@ -19,24 +24,34 @@ public class ClientConnector {
 	}
 	
 	private Client connectClients() {
-		String inputLine;
 		int targetId = recieveTargetId();
-		
 		Client targetClient = ServerLauncher.getClientById(targetId);
+		if (targetClient == null) return null;
+		if (establishConnection(targetClient)) {
+			hostClient.setClientConnection(this);
+			targetClient.setClientConnection(new ClientConnection(targetClient, hostClient));
+			return targetClient;
+		} else {
+			return null;
+		}
+	}
+	
+	private Boolean establishConnection(Client targetClient) {
+		String inputLine;
 		targetClient.writeToClient(hostClient.getId() + " wishes to chat with you, "
-				                   + "do you accept the chat request? (Y/N)");
+								   + "do you accept the chat request? (Y/N)");
 		if ((inputLine = targetClient.readFromClient()) != null) {
 			if (inputLine.matches("[Yy+](es)?")) {
 				targetClient.writeToClient("Chat accepted");
 				hostClient.writeToClient(targetClient.getId() + " accepted chat request");
-				return targetClient;
+				return true;
 			} else {
 				targetClient.writeToClient("Chat declined");
 				hostClient.writeToClient(targetClient.getId() + " declined chat request");
-				return null;
+				return false;
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	private int recieveTargetId() {

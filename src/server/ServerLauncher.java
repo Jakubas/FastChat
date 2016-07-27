@@ -9,10 +9,11 @@ public class ServerLauncher {
 
 	public static Hashtable<Integer,Client> clientTable;
 	
-	public void main(String[] args) throws IOException {
-		if (args[0] == null)
+	public static void main(String[] args) throws IOException {
+		if (args.length == 0 || args[0] == null) {
+			System.err.println("Please enter a port number as an argument");
 			throw new NullPointerException();
-		if (!Utils.isNumeric(args[0]))
+		} else if (!Utils.isNumeric(args[0]))
 			throw new IllegalArgumentException();
 		
 		int portNumber = Integer.parseInt(args[0]);
@@ -28,6 +29,7 @@ public class ServerLauncher {
 		}
 		
 		while (listeningSocket) {
+			System.out.println("Awaiting connection");
 			Socket clientSocket = serverSocket.accept();
 			Client client = new Client(clientSocket);
 			clientTable.put(client.getClientId(), client);
