@@ -1,20 +1,24 @@
 package server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
 
 public class ServerLauncher {
 
-	public static Hashtable<Integer,Client> clientTable;
+	public static Hashtable<Integer,Client> clientTable = new Hashtable<Integer,Client>();
 	
 	public static void main(String[] args) throws IOException {
-		if (args.length == 0 || args[0] == null) {
+		
+		if (args.length == 0) {
 			System.err.println("Please enter a port number as an argument");
-			throw new NullPointerException();
-		} else if (!Utils.isNumeric(args[0]))
-			throw new IllegalArgumentException();
+			System.exit(1);
+		} else if (!Utils.isNumeric(args[0])) {
+			System.err.println("Please use a number for the port");
+			System.exit(1);
+		}
 		
 		int portNumber = Integer.parseInt(args[0]);
 		
@@ -29,9 +33,11 @@ public class ServerLauncher {
 		}
 		
 		while (listeningSocket) {
-			System.out.println("Awaiting connection");
+			System.out.println("Awaiting connection on: " + InetAddress.getLocalHost().getHostAddress());
 			Socket clientSocket = serverSocket.accept();
+			
 			Client client = new Client(clientSocket);
+			System.out.println(clientSocket.getInetAddress().toString() + " has connected");
 			clientTable.put(client.getClientId(), client);
 			client.start();
 		}

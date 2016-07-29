@@ -17,7 +17,7 @@ public class Client extends Thread {
 	private ChatProtocol chatProtocol;
 	
 	public Client(Socket clientSocket) {
-		id = generateId();
+		this.id = generateId();
 		try (
 		    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 		    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
