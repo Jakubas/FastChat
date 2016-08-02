@@ -3,7 +3,8 @@
 	<property name="clientName" value="FastChatClient" />
 	<property name="serverName" value="FastChatServer" />
 	
-	<property name="src.dir" location="src" />
+	<property name="clientsrc.dir" location="src" />
+	<property name="serversrc.dir" location="src" />
 	<property name="build.dir" location="bin" />
 	<property name="dist.dir" location="dist" />
 
@@ -13,18 +14,24 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source ">
-		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" />
+		<javac includeantruntime="false" srcdir="${clientsrc.dir}" destdir="${build.dir}" />
 	</target>
 
 	<target name="distClient" depends="compile" description="client package, output to JAR">
 		<mkdir dir="${dist.dir}" />
-		<jar jarfile="${dist.dir}/${clientName}-${DSTAMP}.jar" basedir="${build.dir}/client" >
+		<jar jarfile="${dist.dir}/${clientName}-${DSTAMP}.jar" basedir="${build.dir}" >
+			<manifest>
+    				<attribute name="Main-Class" value="client.ClientLauncher"/>
+  			</manifest>
 		</jar>
 	</target>
 	
 	<target name="distServer" depends="compile" description="server package, output to JAR">
 		<mkdir dir="${dist.dir}" />
-		<jar jarfile="${dist.dir}/${serverName}-${DSTAMP}.jar" basedir="${build.dir}/server" >
+		<jar jarfile="${dist.dir}/${serverName}-${DSTAMP}.jar" basedir="${build.dir}" >
+			<manifest>
+    				<attribute name="Main-Class" value="server.ServerLauncher"/>
+  			</manifest>
 		</jar>
 	</target>
 
