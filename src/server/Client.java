@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.util.Random;
 public class Client extends Thread {
 
-	
 	private int id;
 	private Socket clientSocket;
 	private PrintWriter out;
@@ -18,15 +17,12 @@ public class Client extends Thread {
 	
 	public Client(Socket clientSocket) {
 		this.id = generateId();
-		try (
-		    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-		    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		){
+		try {
 			this.clientSocket = clientSocket;
-			this.out = out;
-			this.in = in;
+			this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+			this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		} catch (IOException e) {
-			e.printStackTrace();
+			writeToClient("I/O exception with client socket");
 		}
 		
 	}
@@ -35,6 +31,7 @@ public class Client extends Thread {
 		//add check to see if client is still alive
 		chatProtocol = new ChatProtocol(this);
 		chatProtocol.processInput();
+		System.out.println("stopped client " + this.getClientId());
 	}
 	
 	public int generateId() {
@@ -73,15 +70,22 @@ public class Client extends Thread {
 	}
 	
 	public void writeToClient(String s) {
-		out.write(s);
+		out.println(s);
 	}
 	
 	public String readFromClient() {
 		try {
-			return in.readLine();
+			if (in.ready()) {
+				return in.readLine();
+			} else {
+				return "";
+			}
 		} catch (IOException e) {
-			System.err.println("Couldn't read line");
+			return "";
 		}
-		return null;
+	}
+	
+	public void setState(ClientState state) {
+		chatProtocol.state = state;
 	}
 }

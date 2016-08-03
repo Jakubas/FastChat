@@ -37,10 +37,11 @@ public class ServerLauncher {
 			Socket clientSocket = serverSocket.accept();
 			
 			Client client = new Client(clientSocket);
-			System.out.println(clientSocket.getInetAddress().toString() + " has connected");
+			System.out.println(clientSocket.getInetAddress().getHostAddress() + " has connected");
 			clientTable.put(client.getClientId(), client);
 			client.start();
 		}
+		serverSocket.close();
 	}
 	
 	public static Client getClientById(int id) {

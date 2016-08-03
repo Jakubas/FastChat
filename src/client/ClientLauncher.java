@@ -22,24 +22,16 @@ public class ClientLauncher {
     		Socket socket = new Socket(hostAddress, portNumber);
         	PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         ){
-        	System.out.println("2");
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-            String fromServer;
-            String fromUser;
-            System.out.println("3");
-            while ((fromServer = in.readLine()) != null) {
-            	System.out.println("4");
-                System.out.println("Server: " + fromServer);
-//                if (fromServer.equals("Bye."))
-//                    break;
-                 
-                fromUser = stdIn.readLine();
-                if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
-                }
+            ClientInputListener clientInputListener = new ClientInputListener(in);
+            clientInputListener.start();
+            
+            String fromClient;
+            while ((fromClient = stdIn.readLine()) != null) {
+	            out.println(fromClient);
             }
+            
         } catch (UnknownHostException e) {
             System.err.println("unknown host: " + hostAddress);
             System.exit(1);
